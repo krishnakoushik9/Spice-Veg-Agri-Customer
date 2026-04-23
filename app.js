@@ -1,4 +1,5 @@
 // --- CONFIG & CONSTANTS ---
+const VERSION = '1.0.2';
 const FB = {
     apiKey: "AIzaSyCXh_4FVtBnM83-QRP4MhwPB3juiDSr4",
     projectId: "spice-veg-agri"
@@ -7,6 +8,58 @@ const FS_BASE = `https://firestore.googleapis.com/v1/projects/${FB.projectId}/da
 const COLLECTION = 'seed_labels';
 let CURRENT_LABELS = [];
 let EDIT_MODE = false;
+let IS_LOW_SPEED = false;
+
+// --- SPEED TEST AGENT ---
+async function runSpeedTest() {
+    const startTime = performance.now();
+    try {
+        // Fetch a small resource to test latency/speed
+        await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' });
+        const duration = performance.now() - startTime;
+        // If it takes more than 1.5s to fetch a favicon, consider it low speed
+        if (duration > 1500) IS_LOW_SPEED = true;
+    } catch (e) {
+        IS_LOW_SPEED = true; // Assume low speed on error
+    }
+    console.log('Speed Test:', IS_LOW_SPEED ? 'LOW' : 'NORMAL');
+}
+
+// --- UPDATE AGENT ---
+async function checkUpdates() {
+    try {
+        const res = await fetch('https://raw.githubusercontent.com/krishnakoushik9/Spice-Veg-Agri-Customer/main/app.js', { cache: 'no-store' });
+        const text = await res.text();
+        const match = text.match(/const VERSION = '([\d.]+)'/);
+        if (match && match[1] !== VERSION) {
+            console.log(`Update found: ${VERSION} -> ${match[1]}`);
+            // Show update toast and reload
+            showToast('New update found! Updating...', 'success');
+            setTimeout(() => window.location.reload(true), 2000);
+        }
+    } catch (e) {
+        console.error('Update check failed', e);
+    }
+}
+
+// --- IMAGE AGENT ---
+function handleImageLoad(img) {
+    if (IS_LOW_SPEED) {
+        img.dataset.src = img.src;
+        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // 1x1 transparent
+        img.style.cursor = 'pointer';
+        img.style.filter = 'grayscale(100%) blur(2px)';
+        img.onclick = function() {
+            this.src = this.dataset.src;
+            this.style.filter = 'none';
+        };
+        const label = document.createElement('div');
+        label.innerText = 'Tap to load image';
+        label.style.fontSize = '10px';
+        label.style.color = 'var(--text-muted)';
+        img.parentNode.insertBefore(label, img.nextSibling);
+    }
+}
 
 // --- FIRESTORE HELPERS ---
 async function fsSet(collection, docId, data) {
@@ -89,7 +142,13 @@ function togglePassword() {
 }
 
 // --- ROUTER & NAVIGATION ---
-function detectMode() {
+async function detectMode() {
+    await runSpeedTest();
+    checkUpdates();
+    
+    // Apply speed test to existing images
+    document.querySelectorAll('img:not(.no-lazy)').forEach(handleImageLoad);
+
     const params = new URLSearchParams(window.location.search);
     const labelId = params.get('id');
     if (labelId) {
@@ -267,6 +326,25 @@ function openCultivation() {
     const img = document.getElementById('lb-img');
     img.src = `technique_${crop}.png`;
     img.onerror = () => { img.src = 'src/practices.jpg'; }; // fallback
+    
+    // Reset click handler if it was modified by lazy loader previously
+    img.onclick = null; 
+    img.style.filter = 'none';
+    
+    // Apply speed test logic to this image specifically
+    if (IS_LOW_SPEED) {
+        img.dataset.src = img.src;
+        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+        img.style.cursor = 'pointer';
+        img.style.filter = 'grayscale(100%) blur(2px)';
+        img.onclick = function() {
+            this.src = this.dataset.src;
+            this.style.filter = 'none';
+            this.onclick = null;
+        };
+        showToast('Low speed detected. Tap image to load.', 'success');
+    }
+    
     document.getElementById('lightbox').style.display = 'flex';
     history.pushState({lb:1}, '');
 }
