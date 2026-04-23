@@ -266,7 +266,7 @@ function openCultivation() {
     const crop = document.getElementById('c-crop').textContent.toLowerCase().replace(/\s+/g, '_');
     const img = document.getElementById('lb-img');
     img.src = `technique_${crop}.png`;
-    img.onerror = () => { img.src = 'technique_chilli.png'; }; // fallback
+    img.onerror = () => { img.src = 'src/practices.jpg'; }; // fallback
     document.getElementById('lightbox').style.display = 'flex';
     history.pushState({lb:1}, '');
 }
