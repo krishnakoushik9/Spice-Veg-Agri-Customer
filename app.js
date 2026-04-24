@@ -1,6 +1,6 @@
 // --- CONFIG & CONSTANTS ---
-const VERSION = '1.0.6';
-const LAST_UPDATED = 'Apr 24, 2026 11:55 AM';
+const VERSION = '1.0.7';
+const LAST_UPDATED = 'Apr 24, 2026 12:10 PM';
 const FB = {
     apiKey: "AIzaSyCXh_4FVtBnM83-QRP4MhwPB3juiDSr4",
     projectId: "spice-veg-agri"
@@ -28,26 +28,14 @@ async function runSpeedTest() {
 
 // --- UPDATE AGENT ---
 async function checkUpdates() {
-    // Prevent update loops with a cooldown (30 seconds)
-    const now = Date.now();
-    const lastCheck = parseInt(localStorage.getItem('_sv_last_upd_check') || '0');
-    if (now - lastCheck < 30000) return; 
-    localStorage.setItem('_sv_last_upd_check', now.toString());
-
     try {
-        const res = await fetch(`https://raw.githubusercontent.com/krishnakoushik9/Spice-Veg-Agri-Customer/main/app.js?t=${now}`, { cache: 'no-store' });
+        const res = await fetch(`https://raw.githubusercontent.com/krishnakoushik9/Spice-Veg-Agri-Customer/main/app.js?t=${Date.now()}`, { cache: 'no-store' });
         const text = await res.text();
         const match = text.match(/const VERSION = '([\d.]+)'/);
         if (match && match[1] !== VERSION) {
-            console.log(`Update found: ${VERSION} -> ${match[1]}`);
-            showToast('New update found! Refreshing...', 'success');
-            setTimeout(() => {
-                window.location.replace(window.location.href.split('#')[0]);
-            }, 1500);
+            console.log(`Update available: ${match[1]} (Current: ${VERSION})`);
         }
-    } catch (e) {
-        console.error('Update check failed', e);
-    }
+    } catch (e) {}
 }
 
 // --- IMAGE AGENT ---
