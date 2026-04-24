@@ -203,3 +203,26 @@ button:active { opacity: 0.8; }
     #print-area, #print-area * { visibility: visible; }
     #print-area { position: absolute; left: 0; top: 0; width: 60mm; }
 }
+
+/* Status Footer */
+.status-footer {
+    position: fixed;
+    bottom: 8px;
+    right: 12px;
+    font-size: 10px;
+    color: var(--text-muted);
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 1000;
+}
+#status-symbol {
+    font-size: 8px;
+    color: var(--danger);
+    transition: color 0.3s;
+}
+#status-symbol.ok {
+    color: var(--green-primary);
+}

@@ -1,5 +1,6 @@
 // --- CONFIG & CONSTANTS ---
-const VERSION = '1.0.2';
+const VERSION = '1.0.3';
+const LAST_UPDATED = 'Apr 24, 2026 10:45 AM';
 const FB = {
     apiKey: "AIzaSyCXh_4FVtBnM83-QRP4MhwPB3juiDSr4",
     projectId: "spice-veg-agri"
@@ -145,6 +146,7 @@ function togglePassword() {
 async function detectMode() {
     await runSpeedTest();
     checkUpdates();
+    initStatus();
     
     // Apply speed test to existing images
     document.querySelectorAll('img:not(.no-lazy)').forEach(handleImageLoad);
@@ -439,6 +441,31 @@ function printLabelUI() {
     `);
     w.document.close();
     setTimeout(() => { w.print(); }, 500);
+}
+
+async function initStatus() {
+    const elVer = document.getElementById('status-version');
+    const elUpd = document.getElementById('status-updated');
+    const elSym = document.getElementById('status-symbol');
+    
+    if (elVer) elVer.textContent = VERSION;
+    if (elUpd) elUpd.textContent = LAST_UPDATED;
+    
+    // Simple check: Components (QRCode) + Firebase Ping
+    try {
+        const componentsOk = typeof QRCode !== 'undefined';
+        const fbRes = await fetch(`${FS_BASE}?key=${FB.apiKey}&pageSize=1`);
+        const fbOk = fbRes.ok;
+        
+        if (componentsOk && fbOk) {
+            elSym.classList.add('ok');
+            elSym.title = 'Systems Operational: Components Loaded & Firebase Live';
+        } else {
+            elSym.title = 'Systems Check Failed: ' + (!componentsOk ? 'Components Missing ' : '') + (!fbOk ? 'Firebase Offline' : '');
+        }
+    } catch (e) {
+        elSym.title = 'Connection Error';
+    }
 }
 
 // --- INIT ---
