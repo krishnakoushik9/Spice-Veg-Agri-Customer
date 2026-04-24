@@ -129,13 +129,6 @@ button:active { opacity: 0.8; }
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Quality Progress Bar */
-.quality-bar { display: flex; align-items: center; margin: 12px 0; }
-.qb-label { font-size: 13px; width: 85px; color: var(--text-secondary); }
-.qb-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; margin: 0 10px; }
-.qb-fill { height: 100%; background: var(--green-primary); border-radius: 3px; transition: width 0.6s ease; }
-.qb-pct { font-size: 13px; width: 35px; text-align: right; font-weight: 600; color: var(--green-primary); }
-
 /* List View */
 .label-card {
     background: var(--surface);

@@ -204,9 +204,6 @@ async function saveLabel() {
         validUpto: document.getElementById('f-validUpto').value,
         netWeight: document.getElementById('f-netWeight').value,
         mrp: document.getElementById('f-mrp').value,
-        germination: document.getElementById('f-germination').value,
-        purity: document.getElementById('f-purity').value,
-        moisture: document.getElementById('f-moisture').value,
         createdAt: new Date().toISOString()
     };
 
@@ -378,11 +375,6 @@ async function loadCustomerView(id) {
     document.getElementById('c-netWeight').textContent = data.netWeight;
     document.getElementById('c-mrp').textContent = data.mrp;
 
-    // Progress Bars
-    updateBar('germination', data.germination);
-    updateBar('purity', data.purity);
-    updateBar('moisture', data.moisture);
-
     // Back button protection
     history.pushState(null, '', window.location.href);
     window.onpopstate = () => {
@@ -392,12 +384,6 @@ async function loadCustomerView(id) {
             history.pushState(null, '', window.location.href);
         }
     };
-}
-
-function updateBar(id, val) {
-    const v = parseInt(val) || 0;
-    document.getElementById(`q-${id}-fill`).style.width = v + '%';
-    document.getElementById(`q-${id}-pct`).textContent = v + '%';
 }
 
 // --- UTILS ---

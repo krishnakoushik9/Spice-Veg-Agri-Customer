@@ -70,7 +70,7 @@
         <div id="tab-new">
             <div class="field">
                 <label>Label Number</label>
-                <input type="text" id="f-labelNo" readonly style="background:var(--surface2);color:var(--text-muted);">
+                <input type="text" id="f-labelNo" placeholder="e.g. 00001">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="field">
@@ -109,20 +109,6 @@
             <div class="field">
                 <label>MRP (₹)</label>
                 <input type="number" id="f-mrp" placeholder="e.g. 815">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                <div class="field">
-                    <label>Germination%</label>
-                    <input type="number" id="f-germination" placeholder="92">
-                </div>
-                <div class="field">
-                    <label>Purity%</label>
-                    <input type="number" id="f-purity" placeholder="98">
-                </div>
-                <div class="field">
-                    <label>Moisture%</label>
-                    <input type="number" id="f-moisture" placeholder="8">
-                </div>
             </div>
             <button id="save-btn" class="btn-primary" onclick="saveLabel()">Generate & Save Label</button>
 
@@ -179,25 +165,6 @@
             <div style="text-align:center;">
                 <span style="color:var(--text-muted);font-size:12px;display:block;">MRP (Incl. of all taxes)</span>
                 <span style="font-size:20px;font-weight:600;color:var(--text-primary);">₹<span id="c-mrp"></span>/-</span>
-            </div>
-        </div>
-
-        <div style="padding:0 4px;">
-            <h4 style="margin:0 0 12px;font-size:14px;color:var(--text-secondary);">Lot Quality Metrics</h4>
-            <div class="quality-bar">
-                <span class="qb-label">Germination</span>
-                <div class="qb-track"><div id="q-germination-fill" class="qb-fill"></div></div>
-                <span id="q-germination-pct" class="qb-pct">0%</span>
-            </div>
-            <div class="quality-bar">
-                <span class="qb-label">Purity</span>
-                <div class="qb-track"><div id="q-purity-fill" class="qb-fill"></div></div>
-                <span id="q-purity-pct" class="qb-pct">0%</span>
-            </div>
-            <div class="quality-bar">
-                <span class="qb-label">Moisture</span>
-                <div class="qb-track"><div id="q-moisture-fill" class="qb-fill" style="background:#6B8E23;"></div></div>
-                <span id="q-moisture-pct" class="qb-pct">0%</span>
             </div>
         </div>
 
