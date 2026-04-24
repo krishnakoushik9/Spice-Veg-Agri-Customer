@@ -1,6 +1,6 @@
 // --- CONFIG & CONSTANTS ---
-const VERSION = '1.0.3';
-const LAST_UPDATED = 'Apr 24, 2026 10:45 AM';
+const VERSION = '1.0.4';
+const LAST_UPDATED = 'Apr 24, 2026 11:15 AM';
 const FB = {
     apiKey: "AIzaSyCXh_4FVtBnM83-QRP4MhwPB3juiDSr4",
     projectId: "spice-veg-agri"
