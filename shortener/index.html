@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpiceVeg — URL Shortener</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">SpiceVeg</div>
+            <h1>URL Shortener</h1>
+            <p>Convert long seed lot links into compact, shareable URLs.</p>
+        </header>
+
+        <main>
+            <div class="input-group">
+                <label for="longUrl">Target URL</label>
+                <input type="text" id="longUrl" placeholder="https://krishnakoushik9.github.io/Spice-Veg-Agri-Customer/?id=..." autocomplete="off">
+            </div>
+
+            <button id="shortenBtn" class="btn-primary">Generate Short URL</button>
+
+            <div id="resultArea" class="result-area" style="display: none;">
+                <label>Shortened URL</label>
+                <div class="output-box">
+                    <input type="text" id="shortUrl" readonly>
+                    <button id="copyBtn" title="Copy to clipboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+                <p id="statusMsg" class="status-msg"></p>
+            </div>
+        </main>
+
+        <footer>
+            Powered by is.gd API
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
