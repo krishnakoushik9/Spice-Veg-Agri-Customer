@@ -1,6 +1,6 @@
 // --- CONFIG & CONSTANTS ---
-const VERSION = '1.0.4';
-const LAST_UPDATED = 'Apr 24, 2026 11:15 AM';
+const VERSION = '1.0.5';
+const LAST_UPDATED = 'Apr 24, 2026 11:40 AM';
 const FB = {
     apiKey: "AIzaSyCXh_4FVtBnM83-QRP4MhwPB3juiDSr4",
     projectId: "spice-veg-agri"
@@ -29,7 +29,7 @@ async function runSpeedTest() {
 // --- UPDATE AGENT ---
 async function checkUpdates() {
     try {
-        const res = await fetch('https://raw.githubusercontent.com/krishnakoushik9/Spice-Veg-Agri-Customer/main/app.js', { cache: 'no-store' });
+        const res = await fetch(`https://raw.githubusercontent.com/krishnakoushik9/Spice-Veg-Agri-Customer/main/app.js?t=${Date.now()}`, { cache: 'no-store' });
         const text = await res.text();
         const match = text.match(/const VERSION = '([\d.]+)'/);
         if (match && match[1] !== VERSION) {
@@ -231,9 +231,35 @@ function generateQR(lotNo, targetId = 'qr-box') {
     if (targetId === 'qr-box') {
         document.getElementById('qr-url').textContent = url;
         document.getElementById('qr-section').style.display = 'block';
+        const shortenBtn = document.getElementById('btn-shorten');
+        if (shortenBtn) shortenBtn.style.display = 'inline-block';
         container.scrollIntoView({ behavior: 'smooth' });
     } else {
         document.getElementById('modal-url').textContent = url;
+    }
+}
+
+async function shortenUrl() {
+    const urlDisplay = document.getElementById('qr-url');
+    const longUrl = urlDisplay.textContent;
+    if (!longUrl || longUrl.includes('is.gd')) return;
+
+    const btn = document.getElementById('btn-shorten');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Shortening...';
+
+    try {
+        const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
+        const data = await res.json();
+        if (data.shorturl) {
+            urlDisplay.innerHTML = `<span style="color:var(--green-primary);font-weight:600;">${data.shorturl}</span><br><small style="opacity:0.5;font-size:9px;">Long: ${longUrl}</small>`;
+            showToast('URL Shortened! ✓');
+            btn.style.display = 'none';
+        }
+    } catch (e) {
+        showToast('Shortening failed', 'danger');
+    } finally {
+        btn.disabled = false; btn.textContent = originalText;
     }
 }
 

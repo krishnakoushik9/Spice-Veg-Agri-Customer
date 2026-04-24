@@ -113,9 +113,12 @@
                 <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);">QR Code Preview</span>
                 <div id="qr-box" class="qr-box"></div>
                 <p id="qr-url" style="font-size:11px;color:var(--text-muted);word-break:break-all;margin-bottom:16px;"></p>
-                <div style="display:flex;gap:10px;">
-                    <button class="btn-primary" style="background:var(--surface2);color:var(--text-primary);border:1px solid var(--border);" onclick="downloadQR()">Download PNG</button>
-                    <button class="btn-primary" onclick="printLabelUI()">Print Label</button>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <button id="btn-shorten" class="btn-primary" style="background:var(--green-primary);display:none;" onclick="shortenUrl()">Shorten URL</button>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn-primary" style="flex:1;background:var(--surface2);color:var(--text-primary);border:1px solid var(--border);" onclick="downloadQR()">Download PNG</button>
+                        <button class="btn-primary" style="flex:1;" onclick="printLabelUI()">Print Label</button>
+                    </div>
                 </div>
             </div>
         </div>
