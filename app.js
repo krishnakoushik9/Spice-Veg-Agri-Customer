@@ -183,21 +183,10 @@ function switchTab(tab) {
 async function showAdmin() {
     showPage('admin-page');
     hideSpinner();
-    const nextId = await getNextLabelNumber();
-    document.getElementById('f-labelNo').value = nextId;
-}
-
-async function getNextLabelNumber() {
-    const all = await fsList(COLLECTION);
-    if (!all.length) return '00001';
-    const nums = all.map(d => parseInt(d.labelNo || '0')).filter(n => !isNaN(n));
-    const max = Math.max(...nums, 0);
-    return String(max + 1).padStart(5, '0');
 }
 
 async function saveLabel() {
     const data = {
-        labelNo: document.getElementById('f-labelNo').value,
         crop: document.getElementById('f-crop').value,
         variety: document.getElementById('f-variety').value,
         lotNo: document.getElementById('f-lotNo').value,
@@ -220,17 +209,17 @@ async function saveLabel() {
     const btn = document.getElementById('save-btn');
     btn.disabled = true; btn.textContent = 'Saving...';
     
-    await fsSet(COLLECTION, 'label_' + data.labelNo, data);
-    showToast(`Label ${data.labelNo} saved ✓`);
-    generateQR(data.labelNo);
+    await fsSet(COLLECTION, 'lot_' + data.lotNo, data);
+    showToast(`Lot ${data.lotNo} saved ✓`);
+    generateQR(data.lotNo);
     btn.disabled = false; btn.textContent = 'Update Label';
     EDIT_MODE = true;
 }
 
-function generateQR(labelNo, targetId = 'qr-box') {
+function generateQR(lotNo, targetId = 'qr-box') {
     const container = document.getElementById(targetId);
     container.innerHTML = '';
-    const url = `https://krishnakoushik9.github.io/Spice-Veg-Agri-Customer/?id=${labelNo}`;
+    const url = `https://krishnakoushik9.github.io/Spice-Veg-Agri-Customer/?id=${lotNo}`;
     new QRCode(container, {
         text: url,
         width: 180,
@@ -251,9 +240,9 @@ function generateQR(labelNo, targetId = 'qr-box') {
 function downloadQR() {
     const canvas = document.querySelector('#qr-box canvas');
     if (!canvas) return;
-    const labelNo = document.getElementById('f-labelNo').value;
+    const lotNo = document.getElementById('f-lotNo').value;
     const link = document.createElement('a');
-    link.download = `SpiceVeg_Label_${labelNo}.png`;
+    link.download = `SpiceVeg_Lot_${lotNo}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
 }
@@ -264,7 +253,7 @@ async function loadLabelList() {
     const list = await fsList(COLLECTION);
     container.innerHTML = '';
     if (!list.length) {
-        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);margin-top:40px;">No labels found.</p>';
+        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);margin-top:40px;">No records found.</p>';
         return;
     }
     list.forEach(item => {
@@ -273,16 +262,16 @@ async function loadLabelList() {
         card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                 <div>
-                    <b style="color:var(--green-primary);">#${item.labelNo}</b> — ${item.crop} / ${item.variety}
+                    <b style="color:var(--green-primary);">Lot: ${item.lotNo}</b> — ${item.crop} / ${item.variety}
                     <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
-                        Lot: ${item.lotNo} | Valid: ${item.validUpto}
+                        Valid: ${item.validUpto} | Net Wt: ${item.netWeight}
                     </div>
                 </div>
-                <button onclick="openModal('${item.labelNo}')" style="padding:4px 8px;font-size:11px;background:var(--surface2);border:1px solid var(--border);">QR</button>
+                <button onclick="openModal('${item.lotNo}')" style="padding:4px 8px;font-size:11px;background:var(--surface2);border:1px solid var(--border);">QR</button>
             </div>
             <div style="margin-top:12px;display:flex;gap:8px;">
-                <button onclick="editLabel('${item.labelNo}')" style="flex:1;font-size:12px;padding:6px;background:none;border:1px solid var(--border);">Edit</button>
-                <button onclick="window.open('?id=${item.labelNo}', '_blank')" style="flex:1;font-size:12px;padding:6px;background:none;border:1px solid var(--border);">Open ↗</button>
+                <button onclick="editLabel('${item.lotNo}')" style="flex:1;font-size:12px;padding:6px;background:none;border:1px solid var(--border);">Edit</button>
+                <button onclick="window.open('?id=${item.lotNo}', '_blank')" style="flex:1;font-size:12px;padding:6px;background:none;border:1px solid var(--border);">Open ↗</button>
             </div>
         `;
         container.appendChild(card);
@@ -291,7 +280,7 @@ async function loadLabelList() {
 }
 
 function editLabel(id) {
-    const item = CURRENT_LABELS.find(l => l.labelNo === id);
+    const item = CURRENT_LABELS.find(l => l.lotNo === id);
     if (!item) return;
     for (let k in item) {
         const el = document.getElementById('f-' + k);
@@ -352,14 +341,14 @@ function closeLightbox() { document.getElementById('lightbox').style.display = '
 // --- CUSTOMER LOGIC ---
 async function loadCustomerView(id) {
     showPage('customer-page');
-    const data = await fsGet(COLLECTION, 'label_' + id);
+    const data = await fsGet(COLLECTION, 'lot_' + id);
     hideSpinner();
     
     if (!data) {
         document.getElementById('customer-page').innerHTML = `
             <div style="text-align:center;padding:100px 20px;">
                 <div style="font-size:40px;">⚠️</div>
-                <h3>Label Not Found</h3>
+                <h3>Information Not Found</h3>
                 <p style="color:var(--text-muted);">The QR code you scanned is invalid or the record has been removed.</p>
             </div>
         `;
@@ -367,7 +356,6 @@ async function loadCustomerView(id) {
     }
 
     // Render Data
-    document.getElementById('c-labelNo').textContent = data.labelNo;
     document.getElementById('c-crop').textContent = data.crop;
     document.getElementById('c-variety').textContent = data.variety;
     document.getElementById('c-lotNo').textContent = data.lotNo;
@@ -401,7 +389,6 @@ function showToast(msg, type = 'success') {
 
 function printLabelUI() {
     const data = {
-        labelNo: document.getElementById('f-labelNo').value,
         crop: document.getElementById('f-crop').value,
         variety: document.getElementById('f-variety').value,
         lotNo: document.getElementById('f-lotNo').value,
@@ -426,7 +413,6 @@ function printLabelUI() {
             <div class="brand">SpiceVeg™ <small style="color:#777;font-weight:normal;font-size:8px;">VEGETABLE SEEDS</small></div>
             <div class="hr"></div>
             <center><b>TRUTHFUL LABEL</b></center>
-            <div class="row"><span>Label No:</span> <b>${data.labelNo}</b></div>
             <div class="row"><span>Crop:</span> <b>${data.crop}</b></div>
             <div class="row"><span>Variety:</span> <b>${data.variety}</b></div>
             <div class="row"><span>Lot No:</span> <b>${data.lotNo}</b></div>

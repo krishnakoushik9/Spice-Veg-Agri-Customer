@@ -68,10 +68,6 @@
 
         <!-- Tab: New Label -->
         <div id="tab-new">
-            <div class="field">
-                <label>Label Number</label>
-                <input type="text" id="f-labelNo" placeholder="e.g. 00001">
-            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="field">
                     <label>Crop</label>
@@ -149,10 +145,9 @@
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px;">
             <h4 style="margin:0 0 16px;color:var(--green-primary);letter-spacing:0.05em;text-align:center;">TRUTHFUL LABEL</h4>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">
-                <div><span style="color:var(--text-muted);font-size:12px;display:block;">Label No.</span><b id="c-labelNo"></b></div>
                 <div><span style="color:var(--text-muted);font-size:12px;display:block;">Crop</span><b id="c-crop"></b></div>
                 <div><span style="color:var(--text-muted);font-size:12px;display:block;">Variety</span><b id="c-variety"></b></div>
-                <div><span style="color:var(--text-muted);font-size:12px;display:block;">Lot No.</span><b id="c-lotNo"></b></div>
+                <div style="grid-column: span 2;"><span style="color:var(--text-muted);font-size:12px;display:block;">Lot No.</span><b id="c-lotNo"></b></div>
             </div>
             <div class="hr"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">
