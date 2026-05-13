@@ -150,6 +150,8 @@ async function saveLabel() {
         mrp: document.getElementById('f-mrp').value,
         physicalPurity: document.getElementById('f-physicalPurity').value,
         moisture: document.getElementById('f-moisture').value,
+        germination: document.getElementById('f-germination').value,
+        geneticPurity: document.getElementById('f-geneticPurity').value,
         producedBy: COMPANY.producedBy,
         packedBy:   COMPANY.packedBy,
         marketedBy: COMPANY.marketedBy,
@@ -158,7 +160,8 @@ async function saveLabel() {
     const names = {
         crop:'Commodity (Crop)', variety:'Variety', lotNo:'Lot Number', dot:'Date of Testing',
         dop:'Date of Packaging', validUpto:'Valid Upto', netWeight:'Net Weight', mrp:'MRP',
-        physicalPurity:'Physical Purity', moisture:'Moisture'
+        physicalPurity:'Physical Purity', moisture:'Moisture',
+        germination:'Germination', geneticPurity:'Genetic Purity'
     };
     const hardcoded = ['producedBy', 'packedBy', 'marketedBy', 'createdAt'];
     for (let k in data) {
@@ -439,6 +442,8 @@ async function loadCustomerView(id) {
     document.getElementById('c-mrp').textContent        = data.mrp ? `₹${data.mrp}/-` : '—';
     document.getElementById('c-physicalPurity').textContent = data.physicalPurity || '—';
     document.getElementById('c-moisture').textContent       = data.moisture        || '—';
+    document.getElementById('c-germination').textContent    = data.germination     || '—';
+    document.getElementById('c-geneticPurity').textContent  = data.geneticPurity   || '—';
     // Company details are hardcoded — no DOM ids needed
 
     history.pushState(null, '', window.location.href);
