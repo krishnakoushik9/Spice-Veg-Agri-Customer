@@ -11,6 +11,13 @@ let CURRENT_LABELS = [];
 let EDIT_MODE = false;
 let IS_LOW_SPEED = false;
 
+// Hardcoded company details
+const COMPANY = {
+    producedBy: 'Spice Veg Agri, Hyderabad',
+    packedBy:   'Spice Veg Agri, Hyderabad',
+    marketedBy: 'Spice Veg Agri Pvt. Ltd., Hyderabad'
+};
+
 // --- IMAGE VIEWER STATE ---
 let ivScale = 1;
 let ivTranslateX = 0;
@@ -143,19 +150,19 @@ async function saveLabel() {
         mrp: document.getElementById('f-mrp').value,
         physicalPurity: document.getElementById('f-physicalPurity').value,
         moisture: document.getElementById('f-moisture').value,
-        producedBy: document.getElementById('f-producedBy').value,
-        packedBy: document.getElementById('f-packedBy').value,
-        marketedBy: document.getElementById('f-marketedBy').value,
+        producedBy: COMPANY.producedBy,
+        packedBy:   COMPANY.packedBy,
+        marketedBy: COMPANY.marketedBy,
         createdAt: new Date().toISOString()
     };
     const names = {
         crop:'Commodity (Crop)', variety:'Variety', lotNo:'Lot Number', dot:'Date of Testing',
         dop:'Date of Packaging', validUpto:'Valid Upto', netWeight:'Net Weight', mrp:'MRP',
-        physicalPurity:'Physical Purity', moisture:'Moisture',
-        producedBy:'Produced by', packedBy:'Packed by', marketedBy:'Marketed by'
+        physicalPurity:'Physical Purity', moisture:'Moisture'
     };
+    const hardcoded = ['producedBy', 'packedBy', 'marketedBy', 'createdAt'];
     for (let k in data) {
-        if (!data[k] && k !== 'createdAt') { showToast(`Please fill "${names[k]}"`, 'danger'); return; }
+        if (!data[k] && !hardcoded.includes(k)) { showToast(`Please fill "${names[k]}"`, 'danger'); return; }
     }
     const btn = document.getElementById('save-btn');
     btn.disabled = true; btn.textContent = 'Saving...';
@@ -239,7 +246,7 @@ async function loadLabelList() {
 function editLabel(id) {
     const item = CURRENT_LABELS.find(l => l.lotNo === id);
     if (!item) return;
-    ['crop','variety','lotNo','dot','dop','validUpto','netWeight','mrp','physicalPurity','moisture','producedBy','packedBy','marketedBy'].forEach(k => {
+    ['crop','variety','lotNo','dot','dop','validUpto','netWeight','mrp','physicalPurity','moisture'].forEach(k => {
         const el = document.getElementById('f-' + k);
         if (el && item[k]) el.value = item[k];
     });
@@ -431,10 +438,8 @@ async function loadCustomerView(id) {
     document.getElementById('c-netWeight').textContent  = data.netWeight       || '—';
     document.getElementById('c-mrp').textContent        = data.mrp ? `₹${data.mrp}/-` : '—';
     document.getElementById('c-physicalPurity').textContent = data.physicalPurity || '—';
-    document.getElementById('c-moisture').textContent   = data.moisture        || '—';
-    document.getElementById('c-producedBy').textContent = data.producedBy      || '—';
-    document.getElementById('c-packedBy').textContent   = data.packedBy        || '—';
-    document.getElementById('c-marketedBy').textContent = data.marketedBy      || '—';
+    document.getElementById('c-moisture').textContent       = data.moisture        || '—';
+    // Company details are hardcoded — no DOM ids needed
 
     history.pushState(null, '', window.location.href);
     window.onpopstate = () => {
@@ -451,7 +456,7 @@ function printLabelUI() {
         dot: get('f-dot'), dop: get('f-dop'), validUpto: get('f-validUpto'),
         netWeight: get('f-netWeight'), mrp: get('f-mrp'),
         physicalPurity: get('f-physicalPurity'), moisture: get('f-moisture'),
-        producedBy: get('f-producedBy'), packedBy: get('f-packedBy'), marketedBy: get('f-marketedBy')
+        producedBy: COMPANY.producedBy, packedBy: COMPANY.packedBy, marketedBy: COMPANY.marketedBy
     };
     const canvas = document.querySelector('#qr-box canvas');
     const qr = canvas ? canvas.toDataURL() : '';

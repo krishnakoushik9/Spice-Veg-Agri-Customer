@@ -239,6 +239,67 @@ button:active { opacity: 0.8; }
 }
 .admin-section-title:first-of-type { margin-top: 0; }
 
+/* Admin — hardcoded company preset card */
+.company-preset-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.company-preset-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #eef3e8;
+    font-size: 13px;
+    gap: 8px;
+}
+.company-preset-row:last-of-type { border-bottom: none; }
+.company-preset-row span {
+    color: var(--text-muted);
+    flex: 0 0 38%;
+    font-weight: 500;
+}
+.company-preset-row b {
+    color: var(--text-primary);
+    font-weight: 600;
+    flex: 1;
+    text-align: right;
+}
+.company-preset-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: #f5fbee;
+    border-top: 1px dashed var(--border);
+    padding: 8px 14px;
+    margin: 0;
+}
+
+/* Customer — combined company info block */
+.company-info-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 16px;
+    background: linear-gradient(90deg, #f5fbee, #eef6e0);
+    border-top: 1px solid #e8f2d8;
+}
+.company-info-logo { flex-shrink: 0; }
+.company-info-text { flex: 1; }
+.company-info-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green-primary);
+    margin-bottom: 2px;
+}
+.company-info-line {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
 /* ========================================
    CUSTOMER PAGE — MOBILE-FIRST REDESIGN
    ======================================== */

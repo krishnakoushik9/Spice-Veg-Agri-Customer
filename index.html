@@ -125,19 +125,13 @@
                 <input type="text" id="f-moisture" placeholder="e.g. 6%">
             </div>
 
-            <!-- Producer Details -->
+            <!-- Producer Details (hardcoded) -->
             <div class="admin-section-title">Producer Details</div>
-            <div class="field">
-                <label>Produced by</label>
-                <input type="text" id="f-producedBy" placeholder="e.g. Spice Veg Agri">
-            </div>
-            <div class="field">
-                <label>Packed by</label>
-                <input type="text" id="f-packedBy" placeholder="e.g. Spice Veg Agri, Hyderabad">
-            </div>
-            <div class="field">
-                <label>Marketed by</label>
-                <input type="text" id="f-marketedBy" placeholder="e.g. Spice Veg Agri Pvt Ltd">
+            <div class="company-preset-card">
+                <div class="company-preset-row"><span>Produced by</span><b>Spice Veg Agri, Hyderabad</b></div>
+                <div class="company-preset-row"><span>Packed by</span><b>Spice Veg Agri, Hyderabad</b></div>
+                <div class="company-preset-row"><span>Marketed by</span><b>Spice Veg Agri Pvt. Ltd., Hyderabad</b></div>
+                <p class="company-preset-note">🔒 Company details are preset and cannot be edited.</p>
             </div>
 
             <button id="save-btn" class="btn-primary" onclick="saveLabel()">Generate & Save Label</button>
@@ -235,19 +229,17 @@
                         <span class="data-value" id="c-moisture">—</span>
                     </div>
 
-                    <!-- Producer Section -->
-                    <div class="section-divider full-width"><span>Producer Info</span></div>
-                    <div class="data-row full-width">
-                        <span class="data-label">Produced by</span>
-                        <span class="data-value" id="c-producedBy">—</span>
-                    </div>
-                    <div class="data-row full-width">
-                        <span class="data-label">Packed by</span>
-                        <span class="data-value" id="c-packedBy">—</span>
-                    </div>
-                    <div class="data-row full-width">
-                        <span class="data-label">Marketed by</span>
-                        <span class="data-value" id="c-marketedBy">—</span>
+                    <!-- Producer Section (hardcoded) -->
+                    <div class="section-divider full-width"><span>Company</span></div>
+                    <div class="company-info-block full-width">
+                        <div class="company-info-logo">
+                            <img src="src/SPICE VEG LOGOS.jpeg" class="no-lazy" width="40" height="40" alt="SpiceVeg" style="border-radius:50%;object-fit:cover;border:2px solid var(--green-pale);">
+                        </div>
+                        <div class="company-info-text">
+                            <div class="company-info-name">Spice Veg Agri Pvt. Ltd.</div>
+                            <div class="company-info-line">📍 Hyderabad, Telangana, India</div>
+                            <div class="company-info-line">Produced · Packed · Marketed by Spice Veg Agri</div>
+                        </div>
                     </div>
                 </div>
             </div>
