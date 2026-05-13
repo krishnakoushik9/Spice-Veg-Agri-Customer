@@ -525,6 +525,24 @@ button:active { opacity: 0.8; }
     box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(59,109,17,0.08);
     animation: popupSlideUp 0.3s ease;
 }
+
+
+/* Desktop: widen original container for better use of screen space */
+@media (min-width: 768px) {
+    .container { max-width: 600px; }
+    #customer-page .customer-container { max-width: 580px; margin: 0 auto; }
+    .truthful-card-body { display: grid; grid-template-columns: 1fr 1fr; }
+    .truthful-card-body .full-width { grid-column: 1 / -1; }
+    .truthful-card-body .section-divider { grid-column: 1 / -1; }
+    .truthful-card-body .company-info-block { grid-column: 1 / -1; }
+}
+@media (min-width: 1024px) {
+    .container { max-width: 720px; }
+    #customer-page .customer-container { max-width: 680px; }
+    .customer-hero { border-radius: 0 0 36px 36px; padding: 36px 24px 28px; }
+    .truthful-card { border-radius: 24px; }
+}
+
 @keyframes popupSlideUp {
     from { opacity: 0; transform: translateY(20px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
