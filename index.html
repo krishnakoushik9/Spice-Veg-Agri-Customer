@@ -152,7 +152,17 @@
                 <div id="qr-box" class="qr-box"></div>
                 <p id="qr-url" style="font-size:11px;color:var(--text-muted);word-break:break-all;margin-bottom:16px;"></p>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                    <button id="btn-shorten" class="btn-primary" style="background:var(--green-primary);display:none;" onclick="shortenUrl()">Shorten URL</button>
+                    <div id="shortener-row" style="display:flex;flex-direction:column;gap:6px;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <select id="shortenerSelect" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-size:14px;">
+                                <option value="0">TinyURL (Default)</option>
+                                <option value="1">URLVanish</option>
+                                <option value="2">Shrtco.de</option>
+                            </select>
+                            <button id="shortenBtn" class="btn-primary" style="background:var(--green-primary);flex:1;display:none;" onclick="shortenUrl()">🔗 Shorten &amp; Save</button>
+                        </div>
+                        <span id="shortenerBadge" style="font-size:11px;color:var(--green-primary);text-align:center;min-height:14px;"></span>
+                    </div>
                     <div style="display:flex;gap:10px;">
                         <button class="btn-primary" style="flex:1;background:var(--surface2);color:var(--text-primary);border:1px solid var(--border);" onclick="downloadQR()">Download PNG</button>
                         <button class="btn-primary" style="flex:1;" onclick="printLabelUI()">Print Label</button>

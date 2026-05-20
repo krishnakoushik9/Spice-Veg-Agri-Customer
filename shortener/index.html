@@ -23,10 +23,19 @@
                 <input type="text" id="longUrl" placeholder="https://krishnakoushik9.github.io/Spice-Veg-Agri-Customer/?id=..." autocomplete="off">
             </div>
 
+            <div class="input-group">
+                <label for="serviceSelect">Shortener Service</label>
+                <select id="serviceSelect" class="select-input">
+                    <option value="0">TinyURL (Default)</option>
+                    <option value="1">URLVanish</option>
+                    <option value="2">Shrtco.de</option>
+                </select>
+            </div>
+
             <button id="shortenBtn" class="btn-primary">Generate Short URL</button>
 
             <div id="resultArea" class="result-area" style="display: none;">
-                <label>Shortened URL</label>
+                <label>Shortened URL <span id="serviceUsed" style="font-weight:500;color:var(--success);font-size:12px;margin-left:6px;"></span></label>
                 <div class="output-box">
                     <input type="text" id="shortUrl" readonly>
                     <button id="copyBtn" title="Copy to clipboard">
@@ -34,11 +43,16 @@
                     </button>
                 </div>
                 <p id="statusMsg" class="status-msg"></p>
+
+                <div id="fbSaveWrap" style="display:none;margin-top:16px;padding-top:16px;border-top:1px dashed var(--border);">
+                    <button id="fbSaveBtn" class="btn-primary" style="background:var(--success);">Save to Firebase</button>
+                    <p id="fbSaveStatus" class="status-msg" style="margin-top:8px;"></p>
+                </div>
             </div>
         </main>
 
         <footer>
-            Powered by is.gd API
+            Multi-service shortener · TinyURL · URLVanish · Shrtco.de
         </footer>
     </div>
     <script src="app.js"></script>

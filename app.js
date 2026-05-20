@@ -1,6 +1,6 @@
 // --- CONFIG & CONSTANTS ---
-const VERSION = '1.2.0';
-const LAST_UPDATED = 'May 13, 2026 09:20 AM';
+const VERSION = '1.3.0';
+const LAST_UPDATED = 'May 20, 2026';
 const FB = {
     apiKey: "AIzaSyCXh_4FVtBnM83-QRP4MhwPB3juiDSr4",
     projectId: "spice-veg-agri"
@@ -46,6 +46,42 @@ async function checkUpdates() {
     } catch (e) {}
 }
 
+// --- URL SHORTENER SERVICES ---
+const URL_SHORTENERS = [
+    {
+        name: 'TinyURL',
+        shorten: async (url) => {
+            const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+            if (!res.ok) throw new Error('TinyURL failed');
+            const short = await res.text();
+            if (!short.startsWith('http')) throw new Error('Invalid response');
+            return short.trim();
+        }
+    },
+    {
+        name: 'URLVanish',
+        shorten: async (url) => {
+            const res = await fetch('https://urlvanish.com/create_api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ originalUrl: url })
+            });
+            const data = await res.json();
+            if (data.status !== 'success') throw new Error('URLVanish failed');
+            return data.alias;
+        }
+    },
+    {
+        name: 'Shrtco.de',
+        shorten: async (url) => {
+            const res = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(url)}`);
+            const data = await res.json();
+            if (!data.ok) throw new Error('Shrtco.de failed');
+            return data.result.full_short_link;
+        }
+    }
+];
+
 // --- FIRESTORE HELPERS ---
 async function fsSet(col, docId, data) {
     const fields = {};
@@ -55,6 +91,20 @@ async function fsSet(col, docId, data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields })
     });
+    return res.json();
+}
+
+async function fsPatch(col, docId, fields) {
+    const mask = Object.keys(fields).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+    const fsFields = {};
+    for (const [k, v] of Object.entries(fields)) fsFields[k] = { stringValue: String(v) };
+    const url = `${FS_BASE}/${col}/${docId}?${mask}&key=${FB.apiKey}`;
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: fsFields })
+    });
+    if (!res.ok) throw new Error(`Firestore patch failed (${res.status})`);
     return res.json();
 }
 
@@ -136,7 +186,7 @@ function switchTab(tab) {
 }
 
 // --- ADMIN ---
-async function showAdmin() { showPage('admin-page'); hideSpinner(); }
+async function showAdmin() { showPage('admin-page'); hideSpinner(); initShortenerSelect(); }
 
 async function saveLabel() {
     const data = {
@@ -182,33 +232,87 @@ function generateQR(lotNo, targetId = 'qr-box') {
     const url = `https://krishnakoushik9.github.io/Spice-Veg-Agri-Customer/?id=${lotNo}`;
     new QRCode(container, { text: url, width: 180, height: 180, colorDark: "#1A2410", colorLight: "#FFFFFF", correctLevel: QRCode.CorrectLevel.H });
     if (targetId === 'qr-box') {
-        document.getElementById('qr-url').textContent = url;
+        const qrUrl = document.getElementById('qr-url');
+        qrUrl.textContent = url;
+        qrUrl.dataset.longUrl = url;
         document.getElementById('qr-section').style.display = 'block';
-        const sb = document.getElementById('btn-shorten');
+        const sb = document.getElementById('shortenBtn');
         if (sb) sb.style.display = 'inline-block';
+        const badge = document.getElementById('shortenerBadge');
+        if (badge) badge.textContent = '';
         container.scrollIntoView({ behavior: 'smooth' });
     } else {
         document.getElementById('modal-url').textContent = url;
     }
 }
 
+function initShortenerSelect() {
+    const sel = document.getElementById('shortenerSelect');
+    if (!sel) return;
+    const saved = localStorage.getItem('preferred_shortener');
+    if (saved !== null && URL_SHORTENERS[Number(saved)]) sel.value = saved;
+}
+
 async function shortenUrl() {
     const urlDisplay = document.getElementById('qr-url');
-    const longUrl = urlDisplay.textContent;
-    if (!longUrl || longUrl.includes('is.gd')) return;
-    const btn = document.getElementById('btn-shorten');
-    const orig = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Shortening...';
-    try {
-        const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
-        const data = await res.json();
-        if (data.shorturl) {
-            urlDisplay.innerHTML = `<span style="color:var(--green-primary);font-weight:600;">${data.shorturl}</span><br><small style="opacity:0.5;font-size:9px;">Long: ${longUrl}</small>`;
-            showToast('URL Shortened! ✓');
-            btn.style.display = 'none';
+    const longUrl = (urlDisplay.dataset.longUrl || urlDisplay.textContent).trim();
+    if (!longUrl) return;
+    urlDisplay.dataset.longUrl = longUrl;
+
+    const sel = document.getElementById('shortenerSelect');
+    const startIdx = sel ? Math.max(0, Number(sel.value) || 0) : 0;
+    const order = [];
+    for (let i = 0; i < URL_SHORTENERS.length; i++) {
+        order.push(URL_SHORTENERS[(startIdx + i) % URL_SHORTENERS.length]);
+    }
+
+    const btn = document.getElementById('shortenBtn');
+    const badge = document.getElementById('shortenerBadge');
+    const orig = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Shortening...'; }
+    if (badge) badge.textContent = '';
+
+    let shortUrl = null;
+    let serviceName = null;
+    const errors = [];
+    for (const svc of order) {
+        try {
+            shortUrl = await svc.shorten(longUrl);
+            serviceName = svc.name;
+            break;
+        } catch (e) {
+            errors.push(`${svc.name}: ${e.message}`);
         }
-    } catch (e) { showToast('Shortening failed', 'danger'); }
-    finally { btn.disabled = false; btn.textContent = orig; }
+    }
+
+    if (!shortUrl) {
+        if (btn) { btn.disabled = false; btn.textContent = orig; }
+        showToast('All shorteners failed — keeping long URL', 'danger');
+        console.warn('Shortener errors:', errors);
+        return;
+    }
+
+    urlDisplay.innerHTML = `<a href="${shortUrl}" target="_blank" style="color:var(--green-primary);font-weight:600;text-decoration:none;">${shortUrl}</a><br><small style="opacity:0.55;font-size:9px;">Long: ${longUrl}</small>`;
+    if (badge) badge.textContent = `via ${serviceName} ✓`;
+
+    const startIdxFound = URL_SHORTENERS.findIndex(s => s.name === serviceName);
+    if (startIdxFound >= 0) localStorage.setItem('preferred_shortener', String(startIdxFound));
+
+    const lotNo = new URLSearchParams(longUrl.split('?')[1] || '').get('id');
+    let saved = false;
+    if (lotNo) {
+        try {
+            await fsPatch(COLLECTION, 'lot_' + lotNo, { shortUrl });
+            saved = true;
+        } catch (e) {
+            console.warn('Firestore save failed:', e);
+        }
+    }
+
+    showToast(saved
+        ? `Shortened with ${serviceName} & saved to database ✓`
+        : `Shortened with ${serviceName} ✓`);
+    if (btn) { btn.disabled = false; btn.textContent = orig; btn.style.display = 'none'; }
 }
 
 function downloadQR() {
@@ -229,11 +333,15 @@ async function loadLabelList() {
     list.forEach(item => {
         const card = document.createElement('div');
         card.className = 'label-card';
+        const shortBadge = item.shortUrl
+            ? `<a href="${item.shortUrl}" target="_blank" style="display:inline-block;margin-top:6px;padding:3px 8px;border-radius:10px;background:var(--green-pale);color:var(--green-primary);font-size:11px;font-weight:600;text-decoration:none;">🔗 Short Link</a>`
+            : '';
         card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                 <div>
                     <b style="color:var(--green-primary);">Lot: ${item.lotNo}</b> — ${item.crop} / ${item.variety}
                     <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Valid: ${item.validUpto} | Net Wt: ${item.netWeight}${item.physicalPurity ? ' | Purity: '+item.physicalPurity : ''}</div>
+                    ${shortBadge}
                 </div>
                 <button onclick="openModal('${item.lotNo}')" style="padding:4px 8px;font-size:11px;background:var(--surface2);border:1px solid var(--border);">QR</button>
             </div>
@@ -260,7 +368,22 @@ function editLabel(id) {
 }
 
 // --- MODAL ---
-function openModal(id) { document.getElementById('modal-wrap').style.display = 'flex'; generateQR(id, 'modal-qr'); }
+function openModal(id) {
+    document.getElementById('modal-wrap').style.display = 'flex';
+    generateQR(id, 'modal-qr');
+    const item = CURRENT_LABELS.find(l => l.lotNo === id);
+    const modalUrl = document.getElementById('modal-url');
+    const longUrl = `https://krishnakoushik9.github.io/Spice-Veg-Agri-Customer/?id=${id}`;
+    if (item && item.shortUrl) {
+        modalUrl.innerHTML = `
+            <span style="display:inline-block;text-align:left;">
+                <b style="color:var(--green-primary);">Short:</b> <a href="${item.shortUrl}" target="_blank" style="color:var(--green-primary);">${item.shortUrl}</a><br>
+                <b>Long:</b> <span style="opacity:0.7;">${longUrl}</span>
+            </span>`;
+    } else {
+        modalUrl.textContent = longUrl;
+    }
+}
 function closeModal() { document.getElementById('modal-wrap').style.display = 'none'; }
 function downloadModalQR() {
     const canvas = document.querySelector('#modal-qr canvas');

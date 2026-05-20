@@ -88,6 +88,24 @@ input[type="text"]:focus {
     border-color: var(--secondary);
 }
 
+.select-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: var(--secondary);
+}
+
 .btn-primary {
     width: 100%;
     background: var(--secondary);
